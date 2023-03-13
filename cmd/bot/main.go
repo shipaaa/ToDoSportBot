@@ -1,13 +1,18 @@
 package main
 
 import (
-	"log"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/shipaaa/telegram-sport-bot/pkg/config"
+
+	"log"
 )
 
 func main() {
-	bot, err := tgbotapi.NewBotAPI("Your Telegram Token")
+	cfg, err := config.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+	bot, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
 	if err != nil {
 		log.Panic(err)
 	}
