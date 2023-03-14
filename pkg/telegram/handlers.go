@@ -6,8 +6,9 @@ import (
 )
 
 const (
-	startCommand = "start"
-	helpCommand  = "help"
+	startCommand        = "start"
+	helpCommand         = "help"
+	allExercisesCommand = "allexercises"
 )
 
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
@@ -30,6 +31,8 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 		return b.handleStartCommand(message)
 	case helpCommand:
 		return b.handleHelpCommand(message)
+	case allExercisesCommand:
+		return b.handleAllExercisesCommand(message)
 	default:
 		return b.handleUnknownCommand(message)
 	}
@@ -45,6 +48,17 @@ func (b *Bot) handleHelpCommand(message *tgbotapi.Message) error {
 	msg := tgbotapi.NewMessage(message.Chat.ID, "А это команда /help")
 	_, err := b.bot.Send(msg)
 	return err
+}
+
+func (b *Bot) handleAllExercisesCommand(message *tgbotapi.Message) error {
+	msg := tgbotapi.NewMessage(message.Chat.ID, message.Text)
+
+	msg.ReplyMarkup = b.keyboardAllExercises()
+
+	if _, err := b.bot.Send(msg); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
