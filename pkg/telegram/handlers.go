@@ -13,15 +13,18 @@ const (
 
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
-		if update.Message.IsCommand() {
-			b.handleCommand(update.Message)
-			continue
-		}
+		if update.Message != nil {
 
-		b.handleMessage(update.Message)
+			if update.Message.IsCommand() {
+				b.handleCommand(update.Message)
+				continue
+			}
+
+			b.handleMessage(update.Message)
+
+		} else if update.CallbackQuery != nil {
+			b.callbackAllExercisesKeyboard(update)
+		}
 	}
 }
 
@@ -51,7 +54,7 @@ func (b *Bot) handleHelpCommand(message *tgbotapi.Message) error {
 }
 
 func (b *Bot) handleAllExercisesCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, message.Text)
+	msg := tgbotapi.NewMessage(message.Chat.ID, "Выбери какую группу мышц ты хочешь прокачать")
 
 	msg.ReplyMarkup = b.keyboardAllExercises()
 
