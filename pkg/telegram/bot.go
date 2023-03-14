@@ -16,21 +16,16 @@ func NewBot(bot *tgbotapi.BotAPI) *Bot {
 func (b *Bot) Start() error {
 	log.Printf("Authorized on account %s", b.bot.Self.UserName)
 
+	updates := b.initUpdatesChannel()
+
+	b.handleUpdates(updates)
+
+	return nil
+}
+
+func (b *Bot) initUpdatesChannel() tgbotapi.UpdatesChannel {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates := b.bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		if update.Message != nil { // If we got a message
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-			msg.ReplyToMessageID = update.Message.MessageID
-
-			b.bot.Send(msg)
-		}
-	}
-
-	return nil
+	return b.bot.GetUpdatesChan(u)
 }
