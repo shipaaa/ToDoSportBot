@@ -3,10 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"log"
-	"os"
 )
 
 type Table struct {
@@ -16,21 +13,18 @@ type Table struct {
 	Reference   string
 }
 
-func ConnectToDataBase(tableName string) []Table {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+// Commit: Добавлена функции инициализации database функция вывода упражнений
 
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+func InitDB(url string) (*sql.DB, error) {
+	db, err := sql.Open("postgres", url)
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 
-	return ParseDB(db, tableName)
+	return db, nil
 }
 
-func ParseDB(db *sql.DB, tableName string) []Table {
+func GetAllExercisesFromDB(db *sql.DB, tableName string) []Table {
 	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id", tableName)
 	rows, err := db.Query(query)
 	if err != nil {
