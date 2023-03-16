@@ -13,8 +13,6 @@ type Table struct {
 	Reference   string
 }
 
-// Commit: Добавлена функции инициализации database функция вывода упражнений
-
 func InitDB(url string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", url)
 	if err != nil {

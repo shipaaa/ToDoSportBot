@@ -22,7 +22,7 @@ func getExerciseName(k *tgbotapi.InlineKeyboardMarkup, cbq *tgbotapi.CallbackQue
 	return exercise
 }
 
-func getMessageText(table []models.Table) string {
+func getMessageTextForExerciseKeyboard(table []models.Table) string {
 	var sl []string
 	for _, t := range table {
 		dbRow := fmt.Sprintf("<b>%d. %s</b>\n\n%s\n\n<a href=\"%s\">Видосик обучалка</a>",
