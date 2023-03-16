@@ -33,6 +33,7 @@ func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 			case "breast", "biceps", "triceps", "leg", "back", "shoulder":
 				chatId, exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
 				b.sendMessageForExerciseKeyboard(chatId, exercise)
+				b.deleteMessage(chatId, callbackQuery.Message.MessageID)
 			case "day1", "day2", "day3":
 				// something new :)
 			}

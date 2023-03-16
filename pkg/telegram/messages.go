@@ -16,6 +16,14 @@ func (b *Bot) sendMessage(chatID int64, messageText string) error {
 	return nil
 }
 
+func (b *Bot) deleteMessage(chatID int64, messageID int) error {
+	del := tgbotapi.NewDeleteMessage(chatID, messageID)
+	if _, err := b.api.Request(del); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (b *Bot) sendKeyboard(chatID int64, text string, keyboardFunc func() tgbotapi.InlineKeyboardMarkup) error {
 	msg := tgbotapi.NewMessage(chatID, text)
 	msg.ReplyMarkup = keyboardFunc()
