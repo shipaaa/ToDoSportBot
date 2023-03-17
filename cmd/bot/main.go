@@ -2,30 +2,30 @@ package main
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/joho/godotenv"
+	"github.com/shipaaa/telegram-sport-bot/pkg/config"
 	"github.com/shipaaa/telegram-sport-bot/pkg/models"
 	"github.com/shipaaa/telegram-sport-bot/pkg/telegram"
 
 	"log"
-	"os"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	botAPI, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_BOT_TOKEN"))
+	cfg, err := config.Init()
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 
-	db, err := models.InitDB(os.Getenv("DATABASE_URL"))
+	botAPI, err := tgbotapi.NewBotAPI(cfg.TelegramBotToken)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db, err := models.InitDB(cfg.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
-
+	
 	bot := telegram.NewBot(botAPI, db)
 	if err := bot.Start(); err != nil {
 		log.Fatal(err)
