@@ -13,7 +13,6 @@ WORKDIR /root/
 COPY --from=0 /github.com/shipaaa/telegram-sport-bot/.bin/bot .
 COPY .env .
 
-RUN chmod +x bot
 EXPOSE 80
 
 CMD ["./bot"]
