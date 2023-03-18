@@ -22,8 +22,7 @@ func InitDB(url string) (*sql.DB, error) {
 	return db, nil
 }
 
-func GetAllExercisesFromDB(db *sql.DB, tableName string) []Table {
-	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id", tableName)
+func GetDataFromDB(db *sql.DB, query string) []Table {
 	rows, err := db.Query(query)
 	if err != nil {
 		panic(err)
@@ -39,4 +38,8 @@ func GetAllExercisesFromDB(db *sql.DB, tableName string) []Table {
 		tableData = append(tableData, t)
 	}
 	return tableData
+}
+
+func GenerateQuery(exercise string) string {
+	return fmt.Sprintf("SELECT * FROM %s ORDER BY id", exercise)
 }

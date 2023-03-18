@@ -4,6 +4,7 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
+	"time"
 )
 
 const (
@@ -29,13 +30,27 @@ func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 
 		} else if update.CallbackQuery != nil {
 			callbackQuery := b.getCallbackFromKeyboard(update)
+			chatID := callbackQuery.Message.Chat.ID
 			switch callbackQuery.Data {
 			case "breast", "biceps", "triceps", "leg", "back", "shoulder":
-				chatId, exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
-				b.sendMessageForExerciseKeyboard(chatId, exercise)
-				b.deleteMessage(chatId, callbackQuery.Message.MessageID)
-			case "day1", "day2", "day3":
-				// something new :)
+				exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
+				time.Sleep(time.Second)
+				go b.sendMessageForExerciseKeyboard(chatID, exercise)
+				go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+			case "day1":
+				go b.sendKeyboard(chatID, "Выбери группу мышц", b.keyboardTrainingDay1)
+				go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+			case "day2":
+				go b.sendKeyboard(chatID, "Выбери группу мышц", b.keyboardTrainingDay2)
+				go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+			case "day3":
+				go b.sendKeyboard(chatID, "Выбери группу мышц", b.keyboardTrainingDay3)
+				go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+			case "breastTr1", "bicepsTr1", "tricepsTr1", "legTr1", "backTr1", "shoulderTr1":
+				exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
+				time.Sleep(time.Second)
+				b.sendMessageForKeyboardTraining(chatID, exercise)
+				//go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 			}
 		}
 	}
@@ -57,7 +72,8 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 }
 
 func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
-	return b.sendMessage(message.Chat.ID, "Привет. Ты ввел команду /start")
+	b.sendMessage(message.Chat.ID, "Привееет!!!")
+	return nil
 }
 
 func (b *Bot) handleHelpCommand(message *tgbotapi.Message) error {
@@ -65,12 +81,15 @@ func (b *Bot) handleHelpCommand(message *tgbotapi.Message) error {
 }
 
 func (b *Bot) handleAllExercisesCommand(message *tgbotapi.Message) error {
-	return b.sendKeyboard(message.Chat.ID, "Выбери какую группу мышц ты хочешь прокачать", keyboardAllExercises)
+	go b.sendKeyboard(message.Chat.ID, "Выбери какую группу мышц ты хочешь прокачать", b.keyboardAllExercises)
+	go b.deleteMessage(message.Chat.ID, message.MessageID)
+	return nil
 }
 
 func (b *Bot) handleTrainingProgram(message *tgbotapi.Message) error {
-	//return b.sendMessage(message.Chat.ID, "Пока что не работает. Простите :(")
-	return b.sendKeyboard(message.Chat.ID, "Выбери день", keyboardTrainingProgram)
+	go b.sendKeyboard(message.Chat.ID, "Выбери день", b.keyboardTrainingProgram)
+	go b.deleteMessage(message.Chat.ID, message.MessageID)
+	return nil
 }
 
 func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
