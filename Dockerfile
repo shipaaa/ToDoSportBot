@@ -10,3 +10,5 @@ FROM alpine:latest
 WORKDIR /root/
 
 COPY --from=0 /github.com/shipaaa/telegram-sport-bot/.bin/bot .
+
+CMD ["./bot"]
