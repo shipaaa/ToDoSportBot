@@ -1,6 +1,9 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	TelegramBotToken string
@@ -9,7 +12,7 @@ type Config struct {
 
 func Init() (*Config, error) {
 	if err := setUpViper(); err != nil {
-		return nil, err
+		viper.AutomaticEnv()
 	}
 
 	var cfg Config
@@ -38,11 +41,22 @@ func fromEnv(cfg *Config) error {
 	}
 	cfg.TelegramBotToken = viper.GetString("TELEGRAM_BOT_TOKEN")
 
-	if err := viper.BindEnv("DATABASE_URL"); err != nil {
+	if err := viper.BindEnv("DB_USER"); err != nil {
 		return err
 	}
-	cfg.DatabaseURL = viper.GetString("DATABASE_URL")
+	if err := viper.BindEnv("DB_PASSWORD"); err != nil {
+		return err
+	}
+	if err := viper.BindEnv("DB_HOST"); err != nil {
+		return err
+	}
+	if err := viper.BindEnv("DB_NAME"); err != nil {
+		return err
+	}
 
+	cfg.DatabaseURL = fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable",
+		viper.GetString("DB_USER"), viper.GetString("DB_PASSWORD"), viper.GetString("DB_HOST"),
+		viper.GetString("DB_NAME"))
 	return nil
 }
 
