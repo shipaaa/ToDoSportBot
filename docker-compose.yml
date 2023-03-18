@@ -5,22 +5,22 @@ services:
   bot:
     container_name: telegram-app
     build: .
-    image: shipaaa/telegram-sport-bot:latest
+    command: ./bot
+    restart: unless-stopped
+    env_file:
+      - .env.dev
     depends_on:
       - postgres-db
     ports:
       - "8080:8080"
 
-
   postgres-db:
     container_name: database-postgres
     restart: always
-    image: postgres:latest
+    image: postgres:15.2-alpine3.17
     environment:
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-      - DATABASE_HOST=postgres-db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
     volumes:

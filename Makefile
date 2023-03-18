@@ -7,8 +7,11 @@ build:
 run: build
 	./.bin/bot
 
-build-image:
-	docker build -t shipaaa/telegram-sport-bot:0.1 .
+up:
+	docker-compose -f docker-compose.yml up -d
 
-start-container:
-	docker run --env-file .env -p 80:80 shipaaa/telegram-sport-bot:0.1
+start:
+	docker-compose -f docker-compose.yml start
+
+stop:
+	docker-compose -f docker-compose.yml stop
