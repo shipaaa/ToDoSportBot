@@ -4,7 +4,6 @@ import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
-	"time"
 )
 
 const (
@@ -15,6 +14,7 @@ const (
 )
 
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
+	b.gendersUser = make(map[string]string)
 	for update := range updates {
 		if update.Message != nil {
 			if update.Message.IsCommand() {
@@ -29,29 +29,7 @@ func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 			}
 
 		} else if update.CallbackQuery != nil {
-			callbackQuery := b.getCallbackFromKeyboard(update)
-			chatID := callbackQuery.Message.Chat.ID
-			switch callbackQuery.Data {
-			case "breast", "biceps", "triceps", "leg", "back", "shoulder":
-				exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
-				time.Sleep(time.Second)
-				go b.sendMessageForExerciseKeyboard(chatID, exercise)
-				go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
-			case "day1":
-				go b.sendKeyboard(chatID, "Выбери группу мышц", b.keyboardTrainingDay1)
-				go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
-			case "day2":
-				go b.sendKeyboard(chatID, "Выбери группу мышц", b.keyboardTrainingDay2)
-				go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
-			case "day3":
-				go b.sendKeyboard(chatID, "Выбери группу мышц", b.keyboardTrainingDay3)
-				go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
-			case "breastTr1", "bicepsTr1", "tricepsTr1", "legTr1", "backTr1", "shoulderTr1":
-				exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
-				time.Sleep(time.Second)
-				b.sendMessageForKeyboardTraining(chatID, exercise)
-				//go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
-			}
+			b.handleCallback(update)
 		}
 	}
 }
@@ -71,24 +49,63 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 	}
 }
 
+func (b *Bot) handleCallback(update tgbotapi.Update) {
+	callbackQuery := b.getCallbackFromKeyboard(update)
+	chatID := callbackQuery.Message.Chat.ID
+	switch callbackQuery.Data {
+	case "man", "woman":
+		b.gendersUser[callbackQuery.From.UserName] = callbackQuery.Data
+		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+		go b.sendMessage(chatID,
+			"Хорошо, теперь можешь посмотреть все упражнения, либо выбрать программу тренировок")
+	case "breast", "biceps", "triceps", "leg", "back", "shoulder":
+		exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
+		go b.sendMessageForExerciseKeyboard(chatID, exercise)
+		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+	case "day1":
+		go b.sendKeyboard(chatID, "Выбери группу мышц", b.keyboardTrainingDay1)
+		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+	case "day2":
+		go b.sendKeyboard(chatID, "Выбери группу мышц", b.keyboardTrainingDay2)
+		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+	case "day3":
+		go b.sendKeyboard(chatID, "Выбери группу мышц", b.keyboardTrainingDay3)
+		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+	case "breastTr1", "bicepsTr1", "tricepsTr1", "legTr1", "backTr1", "shoulderTr1":
+		exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
+		b.sendMessageForKeyboardTraining(chatID, exercise)
+	}
+}
+
 func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
-	b.sendMessage(message.Chat.ID, "Привееет!!!")
+	//b.sendMessage(message.Chat.ID, "Привееет!!! Для начала определимся кто ты")
+	b.gendersUser[message.From.UserName] = ""
+	b.sendKeyboard(message.Chat.ID, "Привееет!!! Для начала определимся кто ты", b.keyboardSex)
 	return nil
 }
 
 func (b *Bot) handleHelpCommand(message *tgbotapi.Message) error {
-	return b.sendMessage(message.Chat.ID, "А это команда /help")
+	return b.sendMessage(message.Chat.ID, "Здесь в дальнейшем будет справка бота")
 }
 
 func (b *Bot) handleAllExercisesCommand(message *tgbotapi.Message) error {
-	go b.sendKeyboard(message.Chat.ID, "Выбери какую группу мышц ты хочешь прокачать", b.keyboardAllExercises)
-	go b.deleteMessage(message.Chat.ID, message.MessageID)
+	if b.gendersUser[message.From.UserName] == "man" {
+		go b.sendKeyboard(message.Chat.ID, "Выбери какую группу мышц ты хочешь прокачать", b.keyboardAllExercises)
+		go b.deleteMessage(message.Chat.ID, message.MessageID)
+	} else {
+		b.sendMessage(message.Chat.ID, "Скоро добавим упражнения для прекрасных дам :)")
+	}
+
 	return nil
 }
 
 func (b *Bot) handleTrainingProgram(message *tgbotapi.Message) error {
-	go b.sendKeyboard(message.Chat.ID, "Выбери день", b.keyboardTrainingProgram)
-	go b.deleteMessage(message.Chat.ID, message.MessageID)
+	if b.gendersUser[message.From.UserName] == "man" {
+		go b.sendKeyboard(message.Chat.ID, "Выбери день", b.keyboardTrainingProgram)
+		go b.deleteMessage(message.Chat.ID, message.MessageID)
+	} else {
+		b.sendMessage(message.Chat.ID, "Уже очень скоро здесь будет программа тренировок для девушек :*")
+	}
 	return nil
 }
 

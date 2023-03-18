@@ -7,8 +7,9 @@ import (
 )
 
 type Bot struct {
-	api      *tgbotapi.BotAPI
-	dataBase *sql.DB
+	api         *tgbotapi.BotAPI
+	dataBase    *sql.DB
+	gendersUser map[string]string
 }
 
 func NewBot(bot *tgbotapi.BotAPI, dataBase *sql.DB) *Bot {

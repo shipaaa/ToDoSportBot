@@ -4,6 +4,16 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+func (b *Bot) keyboardSex() tgbotapi.InlineKeyboardMarkup {
+	keyboard := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Мужчина", "man"),
+			tgbotapi.NewInlineKeyboardButtonData("Женщина", "woman"),
+		),
+	)
+	return keyboard
+}
+
 func (b *Bot) keyboardAllExercises() tgbotapi.InlineKeyboardMarkup {
 	keyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
