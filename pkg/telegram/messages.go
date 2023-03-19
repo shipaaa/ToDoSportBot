@@ -11,7 +11,7 @@ func (b *Bot) sendMessage(chatID int64, messageText string) error {
 	msg := tgbotapi.MessageConfig{BaseChat: tgbotapi.BaseChat{ChatID: chatID},
 		ParseMode: "HTML", DisableWebPagePreview: true, Text: messageText}
 	if _, err := b.api.Send(msg); err != nil {
-		return b.sendMessage(chatID, "Произошла ошибка, уже исправляем")
+		return err
 	}
 	return nil
 }
@@ -44,30 +44,29 @@ func (b *Bot) sendMessageForKeyboardTraining(chatId int64, exercise string) erro
 	switch exercise {
 	case "breast":
 		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 5")))
+			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 4")))
 	case "biceps":
 		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 5")))
+			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 4")))
 	case "back":
 		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
 			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 5")))
 	case "triceps":
 		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 5")))
+			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 3")))
 	case "leg":
 		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 10")))
+			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 5")))
 	case "shoulder":
 		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 5")))
+			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 3")))
 	}
 	return nil
 }
 
 func (b *Bot) sendWaitingMessage(keyboard *tgbotapi.InlineKeyboardMarkup,
 	callbackQuery *tgbotapi.CallbackQuery) string {
-	exerciseMessage := fmt.Sprintf("Присылаю упражнения на <b>%s</b>\n"+
-		"Секундочку...", getExerciseName(keyboard, callbackQuery))
+	exerciseMessage := fmt.Sprintf(messageAboutSendEx, getExerciseName(keyboard, callbackQuery))
 	b.sendMessage(callbackQuery.Message.Chat.ID, exerciseMessage)
 	return callbackQuery.Data
 }

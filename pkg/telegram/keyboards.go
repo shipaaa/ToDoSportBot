@@ -7,8 +7,8 @@ import (
 func (b *Bot) keyboardSex() tgbotapi.InlineKeyboardMarkup {
 	keyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Мужчина", "man"),
-			tgbotapi.NewInlineKeyboardButtonData("Женщина", "woman"),
+			tgbotapi.NewInlineKeyboardButtonData("Мужской", "man"),
+			tgbotapi.NewInlineKeyboardButtonData("Женский", "woman"),
 		),
 	)
 	return keyboard
