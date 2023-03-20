@@ -66,7 +66,7 @@ func (b *Bot) sendMessageForKeyboardTraining(chatId int64, exercise string) erro
 
 func (b *Bot) sendWaitingMessage(keyboard *tgbotapi.InlineKeyboardMarkup,
 	callbackQuery *tgbotapi.CallbackQuery) string {
-	exerciseMessage := fmt.Sprintf(messageAboutSendEx, getExerciseName(keyboard, callbackQuery))
+	exerciseMessage := fmt.Sprintf(msgAboutSendEx, getExerciseName(keyboard, callbackQuery))
 	b.sendMessage(callbackQuery.Message.Chat.ID, exerciseMessage)
 	return callbackQuery.Data
 }

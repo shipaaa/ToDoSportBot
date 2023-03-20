@@ -51,19 +51,19 @@ func (b *Bot) handleCallback(update tgbotapi.Update) error {
 	case "man", "woman":
 		b.gendersUser[callbackQuery.From.UserName] = callbackQuery.Data
 		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
-		go b.sendMessage(chatID, messageAfterGenderSelection)
+		go b.sendMessage(chatID, msgAfterGenderSelection)
 	case "breast", "biceps", "triceps", "leg", "back", "shoulder":
 		exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
 		go b.sendMessageForExerciseKeyboard(chatID, exercise)
 		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 	case "day1":
-		go b.sendKeyboard(chatID, messageMuscleGroupSelectionTrainingCom, b.keyboardTrainingDay1)
+		go b.sendKeyboard(chatID, msgMuscleGroupSelectionTrainingCom, b.keyboardTrainingDay1)
 		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 	case "day2":
-		go b.sendKeyboard(chatID, messageMuscleGroupSelectionTrainingCom, b.keyboardTrainingDay2)
+		go b.sendKeyboard(chatID, msgMuscleGroupSelectionTrainingCom, b.keyboardTrainingDay2)
 		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 	case "day3":
-		go b.sendKeyboard(chatID, messageMuscleGroupSelectionTrainingCom, b.keyboardTrainingDay3)
+		go b.sendKeyboard(chatID, msgMuscleGroupSelectionTrainingCom, b.keyboardTrainingDay3)
 		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 	case "breastTr1", "bicepsTr1", "tricepsTr1", "legTr1", "backTr1", "shoulderTr1":
 		exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
@@ -75,29 +75,31 @@ func (b *Bot) handleCallback(update tgbotapi.Update) error {
 }
 
 func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
-	b.sendMessage(message.Chat.ID, messageStartCommand)
+	if b.gendersUser[message.From.UserName] == "" {
+		b.sendMessage(message.Chat.ID, msgStartCommand)
+	}
 	b.handleUsersGender(message)
 	return nil
 }
 
 func (b *Bot) handleUsersGender(message *tgbotapi.Message) error {
 	b.gendersUser[message.From.UserName] = ""
-	b.sendKeyboard(message.Chat.ID, messageGenderSelection, b.keyboardSex)
+	b.sendKeyboard(message.Chat.ID, msgGenderSelection, b.keyboardSex)
 	return nil
 }
 
 func (b *Bot) handleHelpCommand(message *tgbotapi.Message) error {
-	return b.sendMessage(message.Chat.ID, messageHelpCommand)
+	return b.sendMessage(message.Chat.ID, msgHelpCommand)
 }
 
 func (b *Bot) handleAllExercisesCommand(message *tgbotapi.Message) error {
 	if b.gendersUser[message.From.UserName] == "man" {
-		go b.sendKeyboard(message.Chat.ID, messageMuscleGroupSelectionAllEx, b.keyboardAllExercises)
+		go b.sendKeyboard(message.Chat.ID, msgMuscleGroupSelectionAllEx, b.keyboardAllExercises)
 		go b.deleteMessage(message.Chat.ID, message.MessageID)
 	} else if b.gendersUser[message.From.UserName] == "woman" {
-		b.sendMessage(message.Chat.ID, messageWomanProgram2)
+		b.sendMessage(message.Chat.ID, msgWomanProgram2)
 	} else {
-		go b.sendMessage(message.Chat.ID, messageGenderDetermination)
+		go b.sendMessage(message.Chat.ID, msgGenderDetermination)
 		go b.handleUsersGender(message)
 	}
 	return nil
@@ -105,23 +107,23 @@ func (b *Bot) handleAllExercisesCommand(message *tgbotapi.Message) error {
 
 func (b *Bot) handleTrainingProgram(message *tgbotapi.Message) error {
 	if b.gendersUser[message.From.UserName] == "man" {
-		go b.sendKeyboard(message.Chat.ID, messageSelectDay, b.keyboardTrainingProgram)
+		go b.sendKeyboard(message.Chat.ID, msgSelectDay, b.keyboardTrainingProgram)
 		go b.deleteMessage(message.Chat.ID, message.MessageID)
 	} else if b.gendersUser[message.From.UserName] == "woman" {
-		b.sendMessage(message.Chat.ID, messageWomanProgram1)
+		b.sendMessage(message.Chat.ID, msgWomanProgram1)
 	} else {
-		go b.sendMessage(message.Chat.ID, messageGenderDetermination)
+		go b.sendMessage(message.Chat.ID, msgGenderDetermination)
 		go b.handleUsersGender(message)
 	}
 	return nil
 }
 
 func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
-	return b.sendMessage(message.Chat.ID, messageUnknownCommand)
+	return b.sendMessage(message.Chat.ID, msgUnknownCommand)
 }
 
 func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 	log.Printf("[%s] %s", message.From.UserName, message.Text)
-	return b.sendMessage(message.Chat.ID, fmt.Sprintf(messageDefault+"/%s\n/%s\n/%s\n/%s",
+	return b.sendMessage(message.Chat.ID, fmt.Sprintf(msgDefault+"/%s\n/%s\n/%s\n/%s",
 		startCommand, helpCommand, allExercisesCommand, trainingCommand))
 }
