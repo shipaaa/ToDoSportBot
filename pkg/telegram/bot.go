@@ -27,7 +27,7 @@ func (b *Bot) Start() error {
 }
 
 func (b *Bot) initUpdatesChannel() tgbotapi.UpdatesChannel {
-	u := tgbotapi.NewUpdate(0)
+	u := tgbotapi.NewUpdate(-1) // Receive the last message from the user when we turn on the bot
 	u.Timeout = 60
 	return b.api.GetUpdatesChan(u)
 }
