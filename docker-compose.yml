@@ -1,21 +1,20 @@
 version: "3.9"
 
 services:
-
-  bot:
-    container_name: telegram-app
+  tg-bot:
+    container_name: todosportbot-tg-bot
     build: ./
     command: ./bot
     restart: unless-stopped
     env_file:
-      - .env.dev
+      - .env
     ports:
       - "8080:8080"
     depends_on:
       - postgres-db
 
   postgres-db:
-    container_name: database-postgres
+    container_name: todosportbot-db-postgres
     restart: always
     image: postgres:15.2-alpine3.17
     environment:
@@ -23,7 +22,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-    -    postgresdb_bot:/var/lib/postgresql/data
+      - postgresdb_bot:/var/lib/postgresql/data
       - ./pkg/models/tablesCreation.sql:/docker-entrypoint-initdb.d/create_tables.sql
       - ./pkg/models/tablesFilling.sql:/docker-entrypoint-initdb.d/fill_tables.sql
 

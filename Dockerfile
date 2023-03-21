@@ -5,7 +5,7 @@ WORKDIR /github.com/shipaaa/telegram-sport-bot
 
 RUN go build -o ./.bin/bot ./cmd/bot/main.go
 
-FROM alpine:latest
+FROM alpine:3.17
 
 WORKDIR /root/
 
