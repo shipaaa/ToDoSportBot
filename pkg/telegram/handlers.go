@@ -1,7 +1,6 @@
 package telegram
 
 import (
-	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 )
@@ -97,10 +96,10 @@ func (b *Bot) handleAllExercisesCommand(message *tgbotapi.Message) error {
 		go b.sendKeyboard(message.Chat.ID, msgMuscleGroupSelectionAllEx, b.keyboardAllExercises)
 		go b.deleteMessage(message.Chat.ID, message.MessageID)
 	} else if b.gendersUser[message.From.UserName] == "woman" {
-		b.sendMessage(message.Chat.ID, msgWomanProgram2)
+		b.sendMessage(message.Chat.ID, msgWomanProgram1)
 	} else {
-		go b.sendMessage(message.Chat.ID, msgGenderDetermination)
-		go b.handleUsersGender(message)
+		b.sendMessage(message.Chat.ID, msgGenderDetermination)
+		b.handleUsersGender(message)
 	}
 	return nil
 }
@@ -110,10 +109,10 @@ func (b *Bot) handleTrainingProgram(message *tgbotapi.Message) error {
 		go b.sendKeyboard(message.Chat.ID, msgSelectDay, b.keyboardTrainingProgram)
 		go b.deleteMessage(message.Chat.ID, message.MessageID)
 	} else if b.gendersUser[message.From.UserName] == "woman" {
-		b.sendMessage(message.Chat.ID, msgWomanProgram1)
+		b.sendMessage(message.Chat.ID, msgWomanProgram2)
 	} else {
-		go b.sendMessage(message.Chat.ID, msgGenderDetermination)
-		go b.handleUsersGender(message)
+		b.sendMessage(message.Chat.ID, msgGenderDetermination)
+		b.handleUsersGender(message)
 	}
 	return nil
 }
@@ -124,6 +123,5 @@ func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
 
 func (b *Bot) handleMessage(message *tgbotapi.Message) error {
 	log.Printf("[%s] %s", message.From.UserName, message.Text)
-	return b.sendMessage(message.Chat.ID, fmt.Sprintf(msgDefault+"/%s\n/%s\n/%s\n/%s",
-		startCommand, helpCommand, allExercisesCommand, trainingCommand))
+	return b.sendMessage(message.Chat.ID, msgDefault)
 }
