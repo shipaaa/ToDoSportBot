@@ -56,13 +56,13 @@ func (b *Bot) handleCallback(update tgbotapi.Update) error {
 		go b.sendMessageForExerciseKeyboard(chatID, exercise)
 		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 	case "day1":
-		go b.sendKeyboard(chatID, msgMuscleGroupSelectionTrainingCom, b.keyboardTrainingDay1)
+		go b.sendKeyboard(chatID, msgMuscleGroupSelection, b.keyboardTrainingDay1)
 		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 	case "day2":
-		go b.sendKeyboard(chatID, msgMuscleGroupSelectionTrainingCom, b.keyboardTrainingDay2)
+		go b.sendKeyboard(chatID, msgMuscleGroupSelection, b.keyboardTrainingDay2)
 		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 	case "day3":
-		go b.sendKeyboard(chatID, msgMuscleGroupSelectionTrainingCom, b.keyboardTrainingDay3)
+		go b.sendKeyboard(chatID, msgMuscleGroupSelection, b.keyboardTrainingDay3)
 		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 	case "breastTr1", "bicepsTr1", "tricepsTr1", "legTr1", "backTr1", "shoulderTr1":
 		exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
@@ -93,7 +93,7 @@ func (b *Bot) handleHelpCommand(message *tgbotapi.Message) error {
 
 func (b *Bot) handleAllExercisesCommand(message *tgbotapi.Message) error {
 	if b.gendersUser[message.From.UserName] == "man" {
-		go b.sendKeyboard(message.Chat.ID, msgMuscleGroupSelectionAllEx, b.keyboardAllExercises)
+		go b.sendKeyboard(message.Chat.ID, msgMuscleGroupSelection, b.keyboardAllExercises)
 		go b.deleteMessage(message.Chat.ID, message.MessageID)
 	} else if b.gendersUser[message.From.UserName] == "woman" {
 		b.sendMessage(message.Chat.ID, msgWomanProgram1)
