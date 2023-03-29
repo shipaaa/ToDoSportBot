@@ -4,6 +4,17 @@
 
 🤖 A telegram bot that sends exercises to a muscle group that the user chooses
 
+## What can I do with this bot
+
+- View exercises for a specific muscle group
+- View the training program for a specific day
+- Suggest your idea or add a new exercise
+
+## Example
+Usage example of a [Telegram Bot](https://t.me/todoSportBot) on Russian
+
+![](video-example.gif)
+
 ### Description of bot commands
 
 - `/start` — welcome message
@@ -26,10 +37,12 @@ And then depending on your preferences run the program
 
 1. Get install [Postgresql](https://www.postgresql.org/download/)
 2. Create Database and run the following queries in your terminal
+
 ```bash
 psql -U username -d DataBase -a -f pkg/models/tablesCreation.sql
 psql -U username -d DataBase -a -f pkg/models/tablesFilling.sql
 ```
+
 3. Launch the application `make run`
 
 #### Using Docker
