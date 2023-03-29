@@ -13,7 +13,7 @@
 ## Example
 Usage example of a [Telegram Bot](https://t.me/todoSportBot) on Russian
 
-<img height="500" src="video-example.gif" width="650"/>
+<img height="450" src="video-example.gif" width="400"/>
 
 ### Description of bot commands
 
