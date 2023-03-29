@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 type Table struct {
@@ -26,7 +26,7 @@ func InitDB(url string) (*sql.DB, error) {
 func GetDataFromDB(db *sql.DB, query string) []Table {
 	rows, err := db.Query(query)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 	defer rows.Close()
 
@@ -34,7 +34,7 @@ func GetDataFromDB(db *sql.DB, query string) []Table {
 	for rows.Next() {
 		t := Table{}
 		if err = rows.Scan(&t.Id, &t.Exercise, &t.Description, &t.Reference); err != nil {
-			log.Fatal(err)
+			log.Error(err)
 		}
 		tableData = append(tableData, t)
 	}

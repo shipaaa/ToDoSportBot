@@ -2,7 +2,7 @@ package telegram
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
@@ -11,17 +11,20 @@ func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 		if update.Message != nil {
 			if update.Message.IsCommand() {
 				if err := b.handleCommand(update.Message); err != nil {
+					log.Error(err)
 					return
 				}
 				continue
 			}
 
 			if err := b.handleMessage(update.Message); err != nil {
+				log.Error(err)
 				return
 			}
 
 		} else if update.CallbackQuery != nil {
 			if err := b.handleCallback(update); err != nil {
+				log.Error(err)
 				return
 			}
 		}
@@ -68,7 +71,7 @@ func (b *Bot) handleCallback(update tgbotapi.Update) error {
 		exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
 		b.sendMessageForKeyboardTraining(chatID, exercise)
 	default:
-		log.Panic("there is no such callback")
+		log.Warning("There is no such callback")
 	}
 	return nil
 }
@@ -122,6 +125,6 @@ func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
 }
 
 func (b *Bot) handleMessage(message *tgbotapi.Message) error {
-	log.Printf("[%s] %s", message.From.UserName, message.Text)
+	log.Infof("[%s] %s", message.From.UserName, message.Text)
 	return b.sendMessage(message.Chat.ID, msgDefault)
 }

@@ -3,7 +3,7 @@ package telegram
 import (
 	"database/sql"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 type Bot struct {
@@ -17,7 +17,7 @@ func NewBot(bot *tgbotapi.BotAPI, dataBase *sql.DB) *Bot {
 }
 
 func (b *Bot) Start() error {
-	log.Printf("Authorized on account %s", b.api.Self.UserName)
+	log.Infof("Authorized on account %s", b.api.Self.UserName)
 
 	updates := b.initUpdatesChannel()
 
