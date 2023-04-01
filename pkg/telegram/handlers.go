@@ -7,27 +7,29 @@ import (
 
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	b.gendersUser = make(map[string]string)
+
 	for update := range updates {
 		if update.Message != nil {
-			if update.Message.IsCommand() {
-				if err := b.handleCommand(update.Message); err != nil {
-					log.Error(err)
-					return
-				}
-				continue
-			}
-
-			if err := b.handleMessage(update.Message); err != nil {
-				log.Error(err)
-				return
-			}
-
+			b.handleMessageOrCommand(update.Message)
 		} else if update.CallbackQuery != nil {
 			if err := b.handleCallback(update); err != nil {
 				log.Error(err)
 				return
 			}
 		}
+	}
+}
+
+func (b *Bot) handleMessageOrCommand(msg *tgbotapi.Message) {
+	var err error
+	if msg.IsCommand() {
+		err = b.handleCommand(msg)
+	} else {
+		err = b.handleMessage(msg)
+	}
+
+	if err != nil {
+		log.Error(err)
 	}
 }
 
@@ -51,28 +53,55 @@ func (b *Bot) handleCallback(update tgbotapi.Update) error {
 	chatID := callbackQuery.Message.Chat.ID
 	switch callbackQuery.Data {
 	case "man", "woman":
-		b.gendersUser[callbackQuery.From.UserName] = callbackQuery.Data
-		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
-		go b.sendMessage(chatID, msgAfterGenderSelection)
+		err := b.handleGenderSelection(callbackQuery)
+		if err != nil {
+			return err
+		}
 	case "breast", "biceps", "triceps", "leg", "back", "shoulder":
-		exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
-		go b.sendMessageForExerciseKeyboard(chatID, exercise)
-		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
-	case "day1":
-		go b.sendKeyboard(chatID, msgMuscleGroupSelection, b.keyboardTrainingDay1)
-		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
-	case "day2":
-		go b.sendKeyboard(chatID, msgMuscleGroupSelection, b.keyboardTrainingDay2)
-		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
-	case "day3":
-		go b.sendKeyboard(chatID, msgMuscleGroupSelection, b.keyboardTrainingDay3)
-		go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+		err := b.handleMuscleGroupSelection(callbackQuery)
+		if err != nil {
+			return err
+		}
+	case "day1", "day2", "day3":
+		err := b.handleTrainingDaySelection(chatID, callbackQuery)
+		if err != nil {
+			return err
+		}
 	case "breastTr1", "bicepsTr1", "tricepsTr1", "legTr1", "backTr1", "shoulderTr1":
 		exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
 		b.sendMessageForKeyboardTraining(chatID, exercise)
 	default:
 		log.Warning("There is no such callback")
 	}
+	return nil
+}
+
+func (b *Bot) handleGenderSelection(callbackQuery *tgbotapi.CallbackQuery) error {
+	b.gendersUser[callbackQuery.From.UserName] = callbackQuery.Data
+	chatID := callbackQuery.Message.Chat.ID
+	go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+	go b.sendMessage(chatID, msgAfterGenderSelection)
+	return nil
+}
+
+func (b *Bot) handleMuscleGroupSelection(callbackQuery *tgbotapi.CallbackQuery) error {
+	exercise := b.sendWaitingMessage(callbackQuery.Message.ReplyMarkup, callbackQuery)
+	chatID := callbackQuery.Message.Chat.ID
+	go b.sendMessageForExerciseKeyboard(chatID, exercise)
+	go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
+	return nil
+}
+
+func (b *Bot) handleTrainingDaySelection(chatID int64, callbackQuery *tgbotapi.CallbackQuery) error {
+	switch callbackQuery.Data {
+	case "day1":
+		go b.sendKeyboard(chatID, msgMuscleGroupSelection, b.keyboardTrainingDay1)
+	case "day2":
+		go b.sendKeyboard(chatID, msgMuscleGroupSelection, b.keyboardTrainingDay2)
+	case "day3":
+		go b.sendKeyboard(chatID, msgMuscleGroupSelection, b.keyboardTrainingDay3)
+	}
+	go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 	return nil
 }
 
