@@ -40,9 +40,9 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) error {
 	case helpCommand:
 		return b.handleHelpCommand(message)
 	case allExercisesCommand:
-		return b.handleAllExercisesCommand(message)
+		return b.handleProgram(message, msgMuscleGroupSelection, msgWomanProgram1, b.keyboardAllExercises)
 	case trainingCommand:
-		return b.handleTrainingProgram(message)
+		return b.handleProgram(message, msgSelectDay, msgWomanProgram2, b.keyboardTrainingProgram)
 	default:
 		return b.handleUnknownCommand(message)
 	}
@@ -123,26 +123,17 @@ func (b *Bot) handleHelpCommand(message *tgbotapi.Message) error {
 	return b.sendMessage(message.Chat.ID, msgHelpCommand)
 }
 
-func (b *Bot) handleAllExercisesCommand(message *tgbotapi.Message) error {
-	if b.gendersUser[message.From.UserName] == "man" {
-		go b.sendKeyboard(message.Chat.ID, msgMuscleGroupSelection, b.keyboardAllExercises)
-		go b.deleteMessage(message.Chat.ID, message.MessageID)
-	} else if b.gendersUser[message.From.UserName] == "woman" {
-		b.sendMessage(message.Chat.ID, msgWomanProgram1)
-	} else {
-		b.sendMessage(message.Chat.ID, msgGenderDetermination)
-		b.handleUsersGender(message)
-	}
-	return nil
-}
-
-func (b *Bot) handleTrainingProgram(message *tgbotapi.Message) error {
-	if b.gendersUser[message.From.UserName] == "man" {
-		go b.sendKeyboard(message.Chat.ID, msgSelectDay, b.keyboardTrainingProgram)
-		go b.deleteMessage(message.Chat.ID, message.MessageID)
-	} else if b.gendersUser[message.From.UserName] == "woman" {
-		b.sendMessage(message.Chat.ID, msgWomanProgram2)
-	} else {
+func (b *Bot) handleProgram(message *tgbotapi.Message, manProgramMsg, womanMsg string, keyboardFunc func() tgbotapi.InlineKeyboardMarkup) error {
+	gender := b.gendersUser[message.From.UserName]
+	switch gender {
+	case "man":
+		go func() {
+			b.sendKeyboard(message.Chat.ID, manProgramMsg, keyboardFunc)
+			b.deleteMessage(message.Chat.ID, message.MessageID)
+		}()
+	case "woman":
+		b.sendMessage(message.Chat.ID, womanMsg)
+	default:
 		b.sendMessage(message.Chat.ID, msgGenderDetermination)
 		b.handleUsersGender(message)
 	}
