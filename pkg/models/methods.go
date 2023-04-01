@@ -23,7 +23,7 @@ func InitDB(url string) (*sql.DB, error) {
 	return db, nil
 }
 
-func GetDataFromDB(db *sql.DB, query string) []Table {
+func GetDataFromDB(db *sql.DB, query string) ([]Table, error) {
 	rows, err := db.Query(query)
 	if err != nil {
 		log.Error(err)
@@ -38,7 +38,7 @@ func GetDataFromDB(db *sql.DB, query string) []Table {
 		}
 		tableData = append(tableData, t)
 	}
-	return tableData
+	return tableData, nil
 }
 
 func GenerateQuery(exercise string) string {

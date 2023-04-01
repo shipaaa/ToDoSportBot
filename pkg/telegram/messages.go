@@ -34,33 +34,36 @@ func (b *Bot) sendKeyboard(chatID int64, text string, keyboardFunc func() tgbota
 }
 
 func (b *Bot) sendMessageForExerciseKeyboard(chatId int64, exercise string) error {
-	b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(b.dataBase,
-		models.GenerateQuery(exercise))))
+	query := models.GenerateQuery(exercise)
+	tableData, err := models.GetDataFromDB(b.dataBase, query)
+	if err != nil {
+		return err
+	}
+	b.sendMessage(chatId, getMessageTextForExerciseKeyboard(tableData))
 	return nil
 }
 
 func (b *Bot) sendMessageForKeyboardTraining(chatId int64, exercise string) error {
 	exercise = strings.TrimSuffix(exercise, "Tr1")
-	switch exercise {
-	case "breast":
-		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 4")))
-	case "biceps":
-		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 4")))
-	case "back":
-		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 5")))
-	case "triceps":
-		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 3")))
-	case "leg":
-		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 5")))
-	case "shoulder":
-		b.sendMessage(chatId, getMessageTextForExerciseKeyboard(models.GetDataFromDB(
-			b.dataBase, models.GenerateQuery(exercise)+" LIMIT 3")))
+	exerciseLimit := map[string]int{
+		"breast":   4,
+		"biceps":   4,
+		"back":     5,
+		"triceps":  3,
+		"leg":      5,
+		"shoulder": 3,
 	}
+	limit, ok := exerciseLimit[exercise]
+	if !ok {
+		return fmt.Errorf("unsupported exercise type: %s", exercise)
+	}
+	query := models.GenerateQuery(exercise) + fmt.Sprintf(" LIMIT %d", limit)
+	data, err := models.GetDataFromDB(b.dataBase, query)
+	if err != nil {
+		return err
+	}
+	text := getMessageTextForExerciseKeyboard(data)
+	b.sendMessage(chatId, text)
 	return nil
 }
 
