@@ -17,7 +17,9 @@ func getExerciseName(k *tgbotapi.InlineKeyboardMarkup, cbq *tgbotapi.CallbackQue
 	return ""
 }
 
-func getSelectedButton(k *tgbotapi.InlineKeyboardMarkup, cbq *tgbotapi.CallbackQuery) *tgbotapi.InlineKeyboardButton {
+func getSelectedButton(k *tgbotapi.InlineKeyboardMarkup,
+	cbq *tgbotapi.CallbackQuery) *tgbotapi.InlineKeyboardButton {
+
 	for _, row := range k.InlineKeyboard {
 		for _, button := range row {
 			if button.CallbackData != nil && *button.CallbackData == cbq.Data {

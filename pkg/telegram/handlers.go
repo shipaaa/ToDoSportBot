@@ -123,7 +123,9 @@ func (b *Bot) handleHelpCommand(message *tgbotapi.Message) error {
 	return b.sendMessage(message.Chat.ID, msgHelpCommand)
 }
 
-func (b *Bot) handleProgram(message *tgbotapi.Message, manProgramMsg, womanMsg string, keyboardFunc func() tgbotapi.InlineKeyboardMarkup) error {
+func (b *Bot) handleProgram(message *tgbotapi.Message,
+	manProgramMsg, womanMsg string, keyboardFunc func() tgbotapi.InlineKeyboardMarkup) error {
+
 	gender := b.gendersUser[message.From.UserName]
 	switch gender {
 	case "man":
