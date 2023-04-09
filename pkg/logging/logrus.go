@@ -15,9 +15,7 @@ func StartLogging() {
 
 	log.SetFormatter(&log.TextFormatter{FullTimestamp: true, TimestampFormat: "02.01 15:04:05"})
 
-	// Output to log file and console
 	log.SetOutput(io.MultiWriter(logFile, os.Stdout))
 
-	//logrus show line number
 	log.SetReportCaller(true)
 }
