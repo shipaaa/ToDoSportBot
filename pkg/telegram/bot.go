@@ -9,7 +9,7 @@ import (
 type Bot struct {
 	api         *tgbotapi.BotAPI
 	dataBase    *sql.DB
-	gendersUser map[string]string
+	gendersUser map[int64]string
 }
 
 func NewBot(bot *tgbotapi.BotAPI, dataBase *sql.DB) *Bot {

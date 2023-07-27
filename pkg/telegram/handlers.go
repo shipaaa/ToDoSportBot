@@ -6,7 +6,7 @@ import (
 )
 
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
-	b.gendersUser = make(map[string]string)
+	b.gendersUser = make(map[int64]string)
 
 	for update := range updates {
 		if update.Message != nil {
@@ -77,7 +77,7 @@ func (b *Bot) handleCallback(update tgbotapi.Update) error {
 }
 
 func (b *Bot) handleGenderSelection(callbackQuery *tgbotapi.CallbackQuery) error {
-	b.gendersUser[callbackQuery.From.UserName] = callbackQuery.Data
+	b.gendersUser[callbackQuery.From.ID] = callbackQuery.Data
 	chatID := callbackQuery.Message.Chat.ID
 	go b.deleteMessage(chatID, callbackQuery.Message.MessageID)
 	go b.sendMessage(chatID, msgAfterGenderSelection)
@@ -106,7 +106,7 @@ func (b *Bot) handleTrainingDaySelection(chatID int64, callbackQuery *tgbotapi.C
 }
 
 func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
-	if b.gendersUser[message.From.UserName] == "" {
+	if b.gendersUser[message.From.ID] == "" {
 		b.sendMessage(message.Chat.ID, msgStartCommand)
 	}
 	b.handleUsersGender(message)
@@ -114,7 +114,7 @@ func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
 }
 
 func (b *Bot) handleUsersGender(message *tgbotapi.Message) error {
-	b.gendersUser[message.From.UserName] = ""
+	b.gendersUser[message.From.ID] = ""
 	b.sendKeyboard(message.Chat.ID, msgGenderSelection, b.keyboardSex)
 	return nil
 }
@@ -126,7 +126,7 @@ func (b *Bot) handleHelpCommand(message *tgbotapi.Message) error {
 func (b *Bot) handleProgram(message *tgbotapi.Message,
 	manProgramMsg, womanMsg string, keyboardFunc func() tgbotapi.InlineKeyboardMarkup) error {
 
-	gender := b.gendersUser[message.From.UserName]
+	gender := b.gendersUser[message.From.ID]
 	switch gender {
 	case "man":
 		go func() {
